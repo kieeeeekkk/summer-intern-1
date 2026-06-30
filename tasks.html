@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager - MainCrafts</title>
+  <meta name="description"
+    content="Manage your tasks, track progress, search and filter workloads dynamically with our premium Task Manager Dashboard.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              DEFAULT: '#0f172a',
+              light: '#1e293b',
+              dark: '#0b0f19',
+              glass: 'rgba(15, 23, 42, 0.6)',
+            },
+            indigo: {
+              DEFAULT: '#4f46e5',
+              light: '#6366f1',
+              dark: '#3730a3',
+            },
+            cyan: {
+              DEFAULT: '#06b6d4',
+              light: '#22d3ee',
+              dark: '#0891b2',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            syne: ['Syne', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background: radial-gradient(circle at 50% 0%, #0d1224 0%, #020306 100%);
+      background-color: #020306;
+      color: #f3f4f6;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: radial-gradient(circle at 50% 30%, black 70%, transparent 100%);
+      -webkit-mask-image: radial-gradient(circle at 50% 30%, black 70%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #desktopNav a {
+      position: relative;
+    }
+
+    #desktopNav a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(to right, #6366f1, #06b6d4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateX(-50%);
+    }
+
+    #desktopNav a:hover::after,
+    #desktopNav a.text-cyan-400::after {
+      width: 100%;
+    }
+
+    .btn-premium {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-premium::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent);
+      transition: all 0.7s ease;
+    }
+
+    .btn-premium:hover::before {
+      left: 100%;
+    }
+
+    .btn-premium:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 20px -5px rgba(99, 102, 241, 0.45);
+    }
+
+    .premium-card {
+      background: linear-gradient(135deg, rgba(13, 20, 35, 0.75) 0%, rgba(8, 12, 21, 0.85) 100%) !important;
+      border: 2px solid #000000 !important;
+      backdrop-filter: blur(20px) !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(0, 0, 0, 0.5) !important;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .premium-card:hover {
+      border-color: #000000 !important;
+      box-shadow: 0 35px 65px -15px rgba(0, 0, 0, 0.95), 0 0 30px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Custom Form styling */
+    .form-input-container input,
+    .form-input-container textarea,
+    .form-input-container select {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .form-input-container input:hover,
+    .form-input-container textarea:hover,
+    .form-input-container select:hover {
+      border-color: rgba(6, 182, 212, 0.5) !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    .form-input-container input:focus,
+    .form-input-container textarea:focus,
+    .form-input-container select:focus {
+      border-color: #06b6d4 !important;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* Custom Checkbox Design */
+    .custom-checkbox {
+      position: relative;
+      cursor: pointer;
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+    }
+
+    .custom-checkbox input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 22px;
+      width: 22px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 2px solid #000000;
+      border-radius: 6px;
+      transition: all 0.25s ease;
+    }
+
+    .custom-checkbox:hover .checkmark {
+      border-color: #06b6d4;
+      background-color: rgba(6, 182, 212, 0.1);
+    }
+
+    .custom-checkbox input:checked ~ .checkmark {
+      background-color: #10b981;
+      border-color: #10b981;
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    .custom-checkbox input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    .custom-checkbox .checkmark:after {
+      left: 6px;
+      top: 2px;
+      width: 6px;
+      height: 11px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* Floating Labels Styling */
+    .floating-group {
+      position: relative;
+    }
+    .floating-group label {
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    .floating-group input:focus ~ label,
+    .floating-group input:not(:placeholder-shown) ~ label,
+    .floating-group textarea:focus ~ label,
+    .floating-group textarea:not(:placeholder-shown) ~ label {
+      top: 0.35rem;
+      font-size: 0.75rem;
+      color: #06b6d4;
+    }
+
+    /* Filter Active Tab */
+    .filter-tab {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .filter-tab.active {
+      color: white;
+      background-color: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    /* Toast Container */
+    #toastContainer {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .toast-alert {
+      animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .toast-alert.fade-out {
+      animation: slideOut 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideOut {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans antialiased overflow-x-hidden relative min-h-screen">
+
+  <div id="glow1"
+    class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-indigo-500/15 rounded-full blur-[130px] pointer-events-none z-0 transition-transform duration-300 ease-out">
+  </div>
+  <div id="glow2"
+    class="absolute top-[40%] left-[-10%] w-[450px] h-[450px] bg-cyan-400/15 rounded-full blur-[130px] pointer-events-none z-0 transition-transform duration-300 ease-out">
+  </div>
+  <div id="glow3"
+    class="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-emerald-500/8 rounded-full blur-[130px] pointer-events-none z-0 transition-transform duration-300 ease-out">
+  </div>
+
+  <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300 py-6" id="mainHeader">
+    <div
+      class="absolute top-0 left-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 transition-all duration-100 z-50"
+      id="scrollProgress" style="width: 0%;"></div>
+
+    <div class="max-w-7xl mx-auto px-6 md:px-8 flex items-center justify-between">
+      <a href="index.html"
+        class="flex items-center gap-3 font-syne font-extrabold text-2xl tracking-tight text-white group" id="logoLink">
+        <div
+          class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 transform group-hover:scale-110 transition-all">
+          <i class="fa-solid fa-cube text-white text-base"></i>
+        </div>
+        <span>MainCrafts</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-8" id="desktopNav">
+        <a href="index.html"
+          class="font-medium text-slate-300 hover:text-white transition-colors py-2 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-indigo-500 hover:after:w-full after:transition-all"
+          id="navHome">Home</a>
+        <a href="about.html"
+          class="font-medium text-slate-300 hover:text-white transition-colors py-2 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-indigo-500 hover:after:w-full after:transition-all"
+          id="navAbout">About</a>
+
+        <div class="relative group">
+          <button class="flex items-center gap-1 font-medium text-slate-300 hover:text-white transition-colors py-2"
+            id="dropdownToggle">
+            Services <i class="fa-solid fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+          </button>
+          <div
+            class="absolute top-full left-1/2 -translate-x-1/2 w-60 bg-navy-light/90 backdrop-blur-md border border-white/10 rounded-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 shadow-2xl mt-2">
+            <a href="index.html#services"
+              class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+              <i class="fa-solid fa-code text-indigo-400"></i> Web Development
+            </a>
+            <a href="index.html#services"
+              class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+              <i class="fa-solid fa-mobile-screen-button text-indigo-400"></i> Mobile Apps
+            </a>
+            <a href="index.html#services"
+              class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+              <i class="fa-solid fa-palette text-indigo-400"></i> UI/UX Design
+            </a>
+            <a href="index.html#services"
+              class="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+              <i class="fa-solid fa-cloud text-indigo-400"></i> Cloud Solutions
+            </a>
+          </div>
+        </div>
+
+        <a href="contact.html"
+          class="font-medium text-slate-300 hover:text-white transition-colors py-2 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-indigo-500 hover:after:w-full after:transition-all"
+          id="navContact">Contact</a>
+        <a href="submissions.html"
+          class="font-medium text-slate-300 hover:text-white transition-colors py-2 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-indigo-500 hover:after:w-full after:transition-all"
+          id="navSubmissions">Submissions</a>
+        <a href="tasks.html"
+          class="font-medium text-cyan-400 hover:text-white transition-colors py-2 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-cyan-400"
+          id="navTasks">Tasks</a>
+      </nav>
+
+      <div class="hidden md:flex items-center gap-4">
+        <a href="mailto:hr@maincrafts.com"
+          class="px-5 py-2.5 rounded-full text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all transform hover:-translate-y-0.5 btn-premium"
+          id="careersButton">Careers</a>
+        <a href="contact.html"
+          class="px-5 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-indigo-500 to-cyan-500 text-white hover:from-indigo-600 hover:to-cyan-600 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all transform hover:-translate-y-0.5 btn-premium"
+          id="getStartedButtonNav">Get Started</a>
+      </div>
+
+      <button class="md:hidden flex flex-col justify-center items-center w-8 h-8 text-white focus:outline-none"
+        id="menuToggle" aria-label="Toggle navigation menu">
+        <span class="w-6 h-0.5 bg-current transition-all duration-300 mb-1.5" id="hamburgerLine1"></span>
+        <span class="w-6 h-0.5 bg-current transition-all duration-300 mb-1.5" id="hamburgerLine2"></span>
+        <span class="w-6 h-0.5 bg-current transition-all duration-300" id="hamburgerLine3"></span>
+      </button>
+    </div>
+
+    <div class="hidden md:hidden fixed inset-0 top-[73px] bg-navy/95 backdrop-blur-lg z-40 transition-all duration-300"
+      id="mobileMenu">
+      <div class="flex flex-col p-8 gap-6 h-full overflow-y-auto">
+        <a href="index.html"
+          class="text-xl font-medium text-slate-300 hover:text-white border-b border-white/5 pb-2 transition-colors"
+          id="mobileNavHome">Home</a>
+        <a href="about.html"
+          class="text-xl font-medium text-slate-300 hover:text-white border-b border-white/5 pb-2 transition-colors"
+          id="mobileNavAbout">About</a>
+
+        <div>
+          <button
+            class="flex items-center justify-between w-full text-xl font-medium text-slate-300 hover:text-white border-b border-white/5 pb-2 transition-colors"
+            id="mobileDropdownToggle">
+            Services <i class="fa-solid fa-chevron-down text-sm transition-transform" id="mobileDropdownChevron"></i>
+          </button>
+          <div class="hidden flex flex-col pl-4 mt-2 gap-3" id="mobileServicesDropdown">
+            <a href="index.html#services"
+              class="flex items-center gap-3 text-base text-slate-400 hover:text-white py-1">
+              <i class="fa-solid fa-code text-indigo-400 text-sm"></i> Web Development
+            </a>
+            <a href="index.html#services"
+              class="flex items-center gap-3 text-base text-slate-400 hover:text-white py-1">
+              <i class="fa-solid fa-mobile-screen-button text-indigo-400 text-sm"></i> Mobile Apps
+            </a>
+            <a href="index.html#services"
+              class="flex items-center gap-3 text-base text-slate-400 hover:text-white py-1">
+              <i class="fa-solid fa-palette text-indigo-400 text-sm"></i> UI/UX Design
+            </a>
+            <a href="index.html#services"
+              class="flex items-center gap-3 text-base text-slate-400 hover:text-white py-1">
+              <i class="fa-solid fa-cloud text-indigo-400 text-sm"></i> Cloud Solutions
+            </a>
+          </div>
+        </div>
+
+        <a href="contact.html"
+          class="text-xl font-medium text-slate-300 hover:text-white border-b border-white/5 pb-2 transition-colors"
+          id="mobileNavContact">Contact</a>
+        <a href="submissions.html"
+          class="text-xl font-medium text-slate-300 hover:text-white border-b border-white/5 pb-2 transition-colors"
+          id="mobileNavSubmissions">Submissions</a>
+        <a href="tasks.html" class="text-xl font-medium text-cyan-400 border-b border-white/5 pb-2"
+          id="mobileNavTasks">Tasks</a>
+
+        <div class="flex flex-col gap-4 mt-8">
+          <a href="mailto:hr@maincrafts.com"
+            class="w-full text-center py-3 rounded-full font-semibold border border-white/10 bg-white/5 text-white">Careers</a>
+          <a href="contact.html"
+            class="w-full text-center py-3 rounded-full font-semibold bg-gradient-to-r from-indigo-500 to-cyan-500 text-white">Get
+            Started</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section
+    class="relative pt-32 pb-8 md:pt-40 md:pb-12 overflow-hidden z-10 flex items-center bg-gradient-to-b from-navy-dark via-navy to-navy-light/10 reveal active">
+    <div class="max-w-7xl mx-auto px-6 md:px-8 w-full text-center">
+      <div class="max-w-3xl mx-auto">
+        <h1 class="font-syne font-extrabold text-4xl sm:text-5xl md:text-6xl text-white leading-tight mb-6">
+          Task <span class="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Manager</span> Dashboard
+        </h1>
+        <p class="text-slate-300 text-lg sm:text-xl leading-relaxed">
+          Streamline your workload. Create, edit, schedule, filter, and track tasks locally with high-fidelity analytics.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Main Section -->
+  <section class="pb-24 relative z-10">
+    <div class="max-w-7xl mx-auto px-6 md:px-8">
+
+      <!-- Stats Cards Row -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8 reveal active" id="statsGrid">
+        
+        <!-- Total Tasks Stat -->
+        <div class="premium-card p-6 rounded-3xl flex flex-col items-start relative group overflow-hidden">
+          <div class="absolute inset-0 bg-radial-gradient from-indigo-500/5 to-transparent pointer-events-none"></div>
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg mb-4">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <span class="text-3xl font-extrabold text-white mb-1" id="statTotal">0</span>
+          <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Tasks</p>
+        </div>
+
+        <!-- Completed Tasks Stat -->
+        <div class="premium-card p-6 rounded-3xl flex flex-col items-start relative group overflow-hidden">
+          <div class="absolute inset-0 bg-radial-gradient from-emerald-500/5 to-transparent pointer-events-none"></div>
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg mb-4">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <span class="text-3xl font-extrabold text-white mb-1" id="statCompleted">0</span>
+          <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Completed Tasks</p>
+        </div>
+
+        <!-- Pending Tasks Stat -->
+        <div class="premium-card p-6 rounded-3xl flex flex-col items-start relative group overflow-hidden">
+          <div class="absolute inset-0 bg-radial-gradient from-yellow-500/5 to-transparent pointer-events-none"></div>
+          <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-400 flex items-center justify-center text-lg mb-4">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <span class="text-3xl font-extrabold text-white mb-1" id="statPending">0</span>
+          <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Pending Tasks</p>
+        </div>
+
+        <!-- Progress Stat -->
+        <div class="premium-card p-6 rounded-3xl flex flex-col justify-between relative group overflow-hidden">
+          <div class="absolute inset-0 bg-radial-gradient from-cyan-500/5 to-transparent pointer-events-none"></div>
+          <div class="flex justify-between items-center mb-2">
+            <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Completion Rate</p>
+            <span class="text-sm font-bold text-cyan-400" id="progressPercentage">0%</span>
+          </div>
+          <div class="w-full bg-white/5 rounded-full h-2 mb-2 relative overflow-hidden border border-white/5">
+            <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-cyan-500 h-full rounded-full transition-all duration-700 ease-out" style="width: 0%;"></div>
+          </div>
+          <p class="text-[10px] text-slate-500 font-semibold">Based on active workloads</p>
+        </div>
+
+      </div>
+
+      <!-- Dashboard Layout Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- Form Column (Left) -->
+        <div class="lg:col-span-4 reveal active">
+          <div class="premium-card p-6 md:p-8 rounded-3xl shadow-2xl relative overflow-hidden" id="formCard">
+            <div class="absolute inset-0 bg-radial-gradient from-indigo-500/5 to-transparent pointer-events-none"></div>
+            
+            <h3 class="font-syne font-bold text-xl text-white mb-6" id="formTitle">Create New Task</h3>
+            
+            <form id="taskForm" class="space-y-5 form-input-container" novalidate>
+              
+              <!-- Task Title -->
+              <div class="relative flex flex-col floating-group">
+                <input type="text" id="taskTitle" name="taskTitle" placeholder=" " required
+                  class="peer w-full bg-white/5 border-2 border-black rounded-xl px-4 pt-6 pb-2 text-white placeholder-transparent outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
+                <label for="taskTitle" class="absolute left-4 top-4 text-slate-500 text-sm">Task Title*</label>
+                <span id="titleError" class="hidden text-[11px] text-red-400 mt-1 font-medium"><i
+                    class="fa-solid fa-circle-exclamation mr-1"></i> Task Title is required (min 3 chars).</span>
+              </div>
+
+              <!-- Task Description -->
+              <div class="relative flex flex-col floating-group">
+                <textarea id="taskDesc" name="taskDesc" rows="3" placeholder=" " maxlength="200"
+                  class="peer w-full bg-white/5 border-2 border-black rounded-xl px-4 pt-6 pb-2 text-white placeholder-transparent outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]"></textarea>
+                <label for="taskDesc" class="absolute left-4 top-4 text-slate-500 text-sm">Description (optional)</label>
+                <div class="flex justify-end mt-1">
+                  <span id="descCounter" class="text-[10px] text-slate-500 font-semibold">0 / 200</span>
+                </div>
+              </div>
+
+              <!-- Priority Selector -->
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold text-slate-400">Priority Level</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <label class="flex items-center justify-center gap-1.5 border-2 border-black bg-white/5 hover:bg-white/10 cursor-pointer py-2.5 rounded-xl transition-all duration-200 shadow-lg">
+                    <input type="radio" name="priority" value="low" checked class="hidden peer">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-transparent peer-checked:ring-white"></span>
+                    <span class="text-xs font-semibold text-slate-300">Low</span>
+                  </label>
+                  <label class="flex items-center justify-center gap-1.5 border-2 border-black bg-white/5 hover:bg-white/10 cursor-pointer py-2.5 rounded-xl transition-all duration-200 shadow-lg">
+                    <input type="radio" name="priority" value="medium" class="hidden peer">
+                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 ring-2 ring-transparent peer-checked:ring-white"></span>
+                    <span class="text-xs font-semibold text-slate-300">Medium</span>
+                  </label>
+                  <label class="flex items-center justify-center gap-1.5 border-2 border-black bg-white/5 hover:bg-white/10 cursor-pointer py-2.5 rounded-xl transition-all duration-200 shadow-lg">
+                    <input type="radio" name="priority" value="high" class="hidden peer">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-transparent peer-checked:ring-white"></span>
+                    <span class="text-xs font-semibold text-slate-300">High</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Category -->
+              <div class="flex flex-col gap-1.5">
+                <label for="taskCategory" class="text-xs font-semibold text-slate-400">Category Tag</label>
+                <select id="taskCategory" name="taskCategory"
+                  class="w-full bg-white/5 border-2 border-black rounded-xl px-4 py-3 text-sm text-slate-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
+                  <option value="Work" class="bg-slate-900 text-white">Work</option>
+                  <option value="Personal" class="bg-slate-900 text-white">Personal</option>
+                  <option value="Shopping" class="bg-slate-900 text-white">Shopping</option>
+                  <option value="Coding" class="bg-slate-900 text-white">Coding</option>
+                  <option value="Design" class="bg-slate-900 text-white">Design</option>
+                </select>
+              </div>
+
+              <!-- Due Date -->
+              <div class="flex flex-col gap-1.5">
+                <label for="taskDueDate" class="text-xs font-semibold text-slate-400">Due Date</label>
+                <input type="date" id="taskDueDate" name="taskDueDate"
+                  class="w-full bg-white/5 border-2 border-black rounded-xl px-4 py-3 text-sm text-slate-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
+              </div>
+
+              <!-- Submit Buttons -->
+              <div class="flex flex-col gap-3 pt-2">
+                <button type="submit" id="submitTaskBtn"
+                  class="w-full py-3.5 rounded-xl font-bold bg-gradient-to-r from-indigo-500 to-cyan-500 text-white hover:from-indigo-600 hover:to-cyan-600 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all transform hover:-translate-y-0.5 btn-premium">
+                  Add Task
+                </button>
+                <button type="button" id="cancelEditBtn" class="hidden w-full py-3 rounded-xl font-bold border-2 border-black bg-white/5 hover:bg-white/10 text-white text-sm transition-all shadow-lg">
+                  Cancel Edit
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+        <!-- Task List Column (Right) -->
+        <div class="lg:col-span-8 reveal active flex flex-col gap-6">
+          
+          <!-- Filter Controls Bar -->
+          <div class="premium-card p-5 md:p-6 rounded-3xl backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+            
+            <!-- Search & Priority dropdown -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-grow max-w-xl">
+              <!-- Search bar -->
+              <div class="relative flex-grow">
+                <input type="text" id="taskSearch" placeholder="Search tasks by name..."
+                  class="w-full bg-white/5 border-2 border-black rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+              </div>
+              
+              <!-- Priority Filter -->
+              <select id="filterPriority"
+                class="bg-white/5 border-2 border-black rounded-xl px-4 py-2.5 text-sm text-slate-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 cursor-pointer min-w-[130px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
+                <option value="all" class="bg-slate-900 text-white">All Priorities</option>
+                <option value="high" class="bg-slate-900 text-white">High Priority</option>
+                <option value="medium" class="bg-slate-900 text-white">Medium Priority</option>
+                <option value="low" class="bg-slate-900 text-white">Low Priority</option>
+              </select>
+            </div>
+
+            <!-- Sorting & Clear All -->
+            <div class="flex items-center justify-between md:justify-end gap-3 min-w-[280px]">
+              <!-- Sort Dropdown -->
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-400 font-semibold whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short text-cyan-400"></i> Sort by:</span>
+                <select id="sortTasks"
+                  class="bg-white/5 border-2 border-black rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
+                  <option value="created_desc" class="bg-slate-900 text-white">Newest First</option>
+                  <option value="due_asc" class="bg-slate-900 text-white">Due Date (Asc)</option>
+                  <option value="priority_desc" class="bg-slate-900 text-white">Priority (High-Low)</option>
+                </select>
+              </div>
+
+              <!-- Delete All button -->
+              <button id="clearAllTasksBtn"
+                class="px-4 py-2 rounded-xl text-xs font-semibold border-2 border-black bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 transition-all flex items-center gap-1.5 shadow-lg">
+                <i class="fa-solid fa-trash-can"></i> Clear All
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Status Tabs -->
+          <div class="flex gap-2 p-1.5 bg-white/5 border-2 border-black rounded-2xl max-w-sm shadow-inner">
+            <button class="filter-tab active flex-1 text-center py-2 text-xs font-bold rounded-xl border border-transparent text-slate-400 hover:text-white" data-status="all">All Tasks</button>
+            <button class="filter-tab flex-1 text-center py-2 text-xs font-bold rounded-xl border border-transparent text-slate-400 hover:text-white" data-status="pending">Pending</button>
+            <button class="filter-tab flex-1 text-center py-2 text-xs font-bold rounded-xl border border-transparent text-slate-400 hover:text-white" data-status="completed">Completed</button>
+          </div>
+
+          <!-- Task Cards Grid Container -->
+          <div id="tasksContainer" class="flex flex-col gap-4">
+            <!-- Dynamic task cards loaded here -->
+          </div>
+
+          <!-- Empty State Container -->
+          <div id="emptyState"
+            class="hidden text-center p-12 md:p-16 border border-white/5 rounded-3xl backdrop-blur-md bg-white/[0.02] shadow-2xl relative overflow-hidden">
+            <div class="absolute inset-0 bg-radial-gradient from-indigo-500/5 to-transparent pointer-events-none"></div>
+            <div
+              class="w-16 h-16 rounded-full bg-slate-500/10 text-slate-400 flex items-center justify-center text-3xl mx-auto mb-6 border border-white/5">
+              <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h3 class="font-syne font-bold text-xl text-white mb-2" id="emptyStateTitle">No tasks found</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4 max-w-xs mx-auto" id="emptyStateText">
+              Get started by creating your first task using the workspace form.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="bg-navy-dark border-t border-white/5 py-12 md:py-20 relative z-10 overflow-hidden" id="contact">
+    <div
+      class="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none">
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 md:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+        <div class="lg:col-span-2">
+          <a href="index.html"
+            class="flex items-center gap-3 font-syne font-extrabold text-2xl tracking-tight text-white mb-6"
+            id="footerLogo">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-cyan-500 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-cube text-white text-base"></i>
+            </div>
+            <span>MainCrafts</span>
+          </a>
+          <p class="text-slate-400 leading-relaxed mb-8 max-w-sm">
+            Premium development and design services crafting future-ready experiences. Elevate your startup visual game
+            today.
+          </p>
+
+          <div class="flex items-center gap-4">
+            <a href="#"
+              class="w-10 h-10 rounded-full bg-white/5 hover:bg-indigo-500 hover:text-white border border-white/10 flex items-center justify-center text-slate-400 hover:border-indigo-500 transition-all"
+              aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+            <a href="#"
+              class="w-10 h-10 rounded-full bg-white/5 hover:bg-indigo-500 hover:text-white border border-white/10 flex items-center justify-center text-slate-400 hover:border-indigo-500 transition-all"
+              aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="#"
+              class="w-10 h-10 rounded-full bg-white/5 hover:bg-indigo-500 hover:text-white border border-white/10 flex items-center justify-center text-slate-400 hover:border-indigo-500 transition-all"
+              aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="#"
+              class="w-10 h-10 rounded-full bg-white/5 hover:bg-indigo-500 hover:text-white border border-white/10 flex items-center justify-center text-slate-400 hover:border-indigo-500 transition-all"
+              aria-label="Dribbble"><i class="fa-brands fa-dribbble"></i></a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-syne font-bold text-white text-sm tracking-wider uppercase mb-6">Company</h4>
+          <ul class="space-y-4">
+            <li><a href="index.html" class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">Home</a></li>
+            <li><a href="about.html" class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">About</a></li>
+            <li><a href="index.html#features"
+                class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">Features</a></li>
+            <li><a href="mailto:hr@maincrafts.com"
+                class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">Careers</a></li>
+            <li><a href="tasks.html"
+                class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">Tasks</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-syne font-bold text-white text-sm tracking-wider uppercase mb-6">Services</h4>
+          <ul class="space-y-4">
+            <li><a href="index.html#services" class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">Web
+                Design</a></li>
+            <li><a href="index.html#services"
+                class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">Mobile Apps</a></li>
+            <li><a href="index.html#services" class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">UI/UX
+                Strategy</a></li>
+            <li><a href="index.html#services" class="text-slate-400 hover:text-cyan-400 text-sm transition-colors">Cloud
+                Engineering</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-syne font-bold text-white text-sm tracking-wider uppercase mb-6">Get in Touch</h4>
+          <div class="space-y-6">
+            <div class="flex items-start gap-4">
+              <i class="fa-solid fa-envelope text-indigo-400 mt-1"></i>
+              <div>
+                <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Email Us</p>
+                <a href="mailto:hr@maincrafts.com"
+                  class="text-sm text-slate-300 hover:text-cyan-400 transition-colors">hr@maincrafts.com</a>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <i class="fa-solid fa-globe text-indigo-400 mt-1"></i>
+              <div>
+                <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Visit Website</p>
+                <a href="http://www.maincrafts.com" target="_blank" rel="noopener noreferrer"
+                  class="text-sm text-slate-300 hover:text-cyan-400 transition-colors">www.maincrafts.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p class="text-sm text-slate-500">&copy; 2026 MainCrafts. All rights reserved.</p>
+        <div class="flex gap-6">
+          <a href="#" class="text-sm text-slate-500 hover:text-slate-400 transition-colors">Privacy Policy</a>
+          <a href="#" class="text-sm text-slate-500 hover:text-slate-400 transition-colors">Terms & Conditions</a>
+          <a href="contact.html" class="text-sm text-slate-500 hover:text-slate-400 transition-colors">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Clear All Confirmation Modal -->
+  <div id="confirmClearModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center p-6 transition-all duration-300">
+    <div class="absolute inset-0 bg-navy-dark/80 backdrop-blur-sm" id="modalClearOverlay"></div>
+    <div
+      class="bg-navy-light/95 border border-white/10 p-8 rounded-3xl max-w-md w-full relative z-10 shadow-2xl transform scale-95 opacity-0 transition-all duration-300"
+      id="modalClearCard">
+      <div
+        class="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-xl mx-auto mb-4">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="font-syne font-bold text-xl text-white text-center mb-2">Clear All Tasks?</h3>
+      <p class="text-slate-400 text-sm text-center mb-6">Are you sure you want to permanently delete all tasks? This action cannot be undone.</p>
+      <div class="flex gap-4">
+        <button id="cancelClearBtn"
+          class="flex-1 py-3 rounded-xl font-bold border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all text-sm">Cancel</button>
+        <button id="confirmClearBtn"
+          class="flex-1 py-3 rounded-xl font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20 transition-all text-sm">Yes, Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Task Confirmation Modal -->
+  <div id="confirmDeleteModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center p-6 transition-all duration-300">
+    <div class="absolute inset-0 bg-navy-dark/80 backdrop-blur-sm" id="modalDeleteOverlay"></div>
+    <div
+      class="bg-navy-light/95 border border-white/10 p-8 rounded-3xl max-w-md w-full relative z-10 shadow-2xl transform scale-95 opacity-0 transition-all duration-300"
+      id="modalDeleteCard">
+      <div
+        class="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-xl mx-auto mb-4">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <h3 class="font-syne font-bold text-xl text-white text-center mb-2">Delete Task?</h3>
+      <p class="text-slate-400 text-sm text-center mb-6">Are you sure you want to remove this task? You can undo this action within 5 seconds.</p>
+      <div class="flex gap-4">
+        <button id="cancelDeleteBtn"
+          class="flex-1 py-3 rounded-xl font-bold border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all text-sm">Cancel</button>
+        <button id="confirmDeleteBtn"
+          class="flex-1 py-3 rounded-xl font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20 transition-all text-sm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Notes Modal -->
+  <div id="notesModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center p-6 transition-all duration-300">
+    <div class="absolute inset-0 bg-navy-dark/80 backdrop-blur-sm" id="modalNotesOverlay"></div>
+    <div
+      class="bg-navy-light/95 border border-white/10 p-8 rounded-3xl max-w-lg w-full relative z-10 shadow-2xl transform scale-95 opacity-0 transition-all duration-300 backdrop-blur-lg"
+      id="modalNotesCard">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-note-sticky animate-pulse"></i>
+          </div>
+          <div>
+            <h3 class="font-syne font-bold text-xl text-white">Task Notes</h3>
+            <p class="text-xs text-slate-400 font-semibold" id="modalNotesTaskTitle">Task Name</p>
+          </div>
+        </div>
+        <button id="closeNotesBtn" class="text-slate-400 hover:text-white transition-colors" title="Close notes">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Notes Textarea -->
+      <div class="relative flex flex-col mb-6">
+        <textarea id="taskNotesArea" rows="6" placeholder="Type your task notes here..." maxlength="1000"
+          class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm resize-none transition-all placeholder-slate-500"></textarea>
+        <div class="flex justify-between items-center mt-3">
+          <span id="notesSavedIndicator" class="hidden text-xs text-emerald-400 font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-circle-check"></i> Saved successfully
+          </span>
+          <span id="notesCharCounter" class="text-[10px] text-slate-500 font-semibold ml-auto">0 / 1000</span>
+        </div>
+      </div>
+
+      <!-- Footer controls -->
+      <div class="flex gap-4">
+        <button id="deleteNotesBtn"
+          class="px-5 py-3 rounded-xl font-bold border border-red-500/20 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 transition-all text-sm flex items-center gap-2">
+          <i class="fa-solid fa-trash-can"></i> Delete Note
+        </button>
+        <button id="saveNotesBtn"
+          class="flex-1 py-3 rounded-xl font-bold bg-gradient-to-r from-indigo-500 to-cyan-500 text-white hover:from-indigo-600 hover:to-cyan-600 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all text-sm flex items-center justify-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i> Save Note
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast alerts container -->
+  <div id="toastContainer"></div>
+
+  <!-- Dashboard JavaScript Code -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Navigation / Global effects
+      const header = document.getElementById('mainHeader');
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileDropdownToggle = document.getElementById('mobileDropdownToggle');
+      const mobileServicesDropdown = document.getElementById('mobileServicesDropdown');
+      const mobileDropdownChevron = document.getElementById('mobileDropdownChevron');
+
+      const hamburgerLine1 = document.getElementById('hamburgerLine1');
+      const hamburgerLine2 = document.getElementById('hamburgerLine2');
+      const hamburgerLine3 = document.getElementById('hamburgerLine3');
+
+      // Scroll Progress Bar
+      const scrollProgress = document.getElementById('scrollProgress');
+      const updateScrollProgress = () => {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (totalHeight > 0) {
+          const progress = (window.scrollY / totalHeight) * 100;
+          scrollProgress.style.width = `${progress}%`;
+        }
+      };
+      window.addEventListener('scroll', updateScrollProgress);
+
+      // Scrolled header background
+      const handleScroll = () => {
+        if (window.scrollY > 50) {
+          header.classList.add('bg-navy-dark/90', 'backdrop-blur-md', 'border-b', 'border-white/5', 'shadow-lg');
+          header.classList.remove('py-6');
+          header.classList.add('py-4');
+        } else {
+          header.classList.remove('bg-navy-dark/90', 'backdrop-blur-md', 'border-b', 'border-white/5', 'shadow-lg');
+          header.classList.remove('py-4');
+          header.classList.add('py-6');
+        }
+      };
+      window.addEventListener('scroll', handleScroll);
+      handleScroll();
+
+      // Mobile navbar trigger
+      if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+          const isOpen = !mobileMenu.classList.contains('hidden');
+          if (isOpen) {
+            mobileMenu.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            hamburgerLine1.classList.remove('rotate-45', 'translate-y-2');
+            hamburgerLine2.classList.remove('opacity-0');
+            hamburgerLine3.classList.remove('-rotate-45', '-translate-y-2');
+          } else {
+            mobileMenu.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            hamburgerLine1.classList.add('rotate-45', 'translate-y-2');
+            hamburgerLine2.classList.add('opacity-0');
+            hamburgerLine3.classList.add('-rotate-45', '-translate-y-2');
+          }
+        });
+      }
+
+      if (mobileDropdownToggle && mobileServicesDropdown) {
+        mobileDropdownToggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          const isDropdownHidden = mobileServicesDropdown.classList.contains('hidden');
+          if (isDropdownHidden) {
+            mobileServicesDropdown.classList.remove('hidden');
+            mobileDropdownChevron.classList.add('rotate-180');
+          } else {
+            mobileServicesDropdown.classList.add('hidden');
+            mobileDropdownChevron.classList.remove('rotate-180');
+          }
+        });
+      }
+
+      // Close mobile navigation on links click
+      const links = mobileMenu.querySelectorAll('a:not(#mobileDropdownToggle)');
+      links.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+          document.body.classList.remove('overflow-hidden');
+          hamburgerLine1.classList.remove('rotate-45', 'translate-y-2');
+          hamburgerLine2.classList.remove('opacity-0');
+          hamburgerLine3.classList.remove('-rotate-45', '-translate-y-2');
+        });
+      });
+
+      // Ambient glowing lights mouse tracking
+      let mouseX = 0, mouseY = 0;
+      let targetX = 0, targetY = 0;
+      document.addEventListener('mousemove', (e) => {
+        targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+        targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      let time = 0;
+      function animateGlows() {
+        time += 0.003;
+        mouseX += (targetX - mouseX) * 0.06;
+        mouseY += (targetY - mouseY) * 0.06;
+
+        const glow1 = document.getElementById('glow1');
+        const glow2 = document.getElementById('glow2');
+        const glow3 = document.getElementById('glow3');
+
+        const driftX1 = Math.sin(time) * 45;
+        const driftY1 = Math.cos(time) * 35;
+        const driftX2 = Math.cos(time * 0.8) * 55;
+        const driftY2 = Math.sin(time * 0.8) * 45;
+        const driftX3 = Math.sin(time * 1.2) * 35;
+        const driftY3 = Math.cos(time * 1.2) * 35;
+
+        if (glow1) glow1.style.transform = `translate(${mouseX * 40 + driftX1}px, ${mouseY * 40 + driftY1}px)`;
+        if (glow2) glow2.style.transform = `translate(${-mouseX * 60 + driftX2}px, ${-mouseY * 60 + driftY2}px)`;
+        if (glow3) glow3.style.transform = `translate(${mouseX * 25 + driftX3}px, ${-mouseY * 25 + driftY3}px)`;
+
+        requestAnimationFrame(animateGlows);
+      }
+      animateGlows();
+
+      // Scroll Reveal Observer
+      const revealElements = document.querySelectorAll('.reveal');
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      revealElements.forEach(el => revealObserver.observe(el));
+
+      // ----------------------------------------------------
+      // 2. Task Manager Core CRUD logic
+      
+      // State
+      let tasks = [];
+      let editingTaskId = null;
+      let deleteTargetIndex = null;
+      let lastDeletedTask = null;
+      let undoTimeout = null;
+
+      // DOM Elements
+      const taskForm = document.getElementById('taskForm');
+      const formTitle = document.getElementById('formTitle');
+      const taskTitleInput = document.getElementById('taskTitle');
+      const taskDescInput = document.getElementById('taskDesc');
+      const taskCategorySelect = document.getElementById('taskCategory');
+      const taskDueDateInput = document.getElementById('taskDueDate');
+      const submitTaskBtn = document.getElementById('submitTaskBtn');
+      const cancelEditBtn = document.getElementById('cancelEditBtn');
+      const titleError = document.getElementById('titleError');
+      const descCounter = document.getElementById('descCounter');
+
+      const tasksContainer = document.getElementById('tasksContainer');
+      const emptyState = document.getElementById('emptyState');
+      const emptyStateTitle = document.getElementById('emptyStateTitle');
+      const emptyStateText = document.getElementById('emptyStateText');
+
+      // Stats
+      const statTotal = document.getElementById('statTotal');
+      const statCompleted = document.getElementById('statCompleted');
+      const statPending = document.getElementById('statPending');
+      const progressPercentage = document.getElementById('progressPercentage');
+      const progressBar = document.getElementById('progressBar');
+
+      // Filters & Search
+      const taskSearchInput = document.getElementById('taskSearch');
+      const filterPrioritySelect = document.getElementById('filterPriority');
+      const sortTasksSelect = document.getElementById('sortTasks');
+      const filterTabs = document.querySelectorAll('.filter-tab');
+      let activeStatusFilter = 'all';
+
+      // Modals
+      const confirmClearModal = document.getElementById('confirmClearModal');
+      const modalClearOverlay = document.getElementById('modalClearOverlay');
+      const modalClearCard = document.getElementById('modalClearCard');
+      const clearAllTasksBtn = document.getElementById('clearAllTasksBtn');
+      const cancelClearBtn = document.getElementById('cancelClearBtn');
+      const confirmClearBtn = document.getElementById('confirmClearBtn');
+
+      const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+      const modalDeleteOverlay = document.getElementById('modalDeleteOverlay');
+      const modalDeleteCard = document.getElementById('modalDeleteCard');
+      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+      const toastContainer = document.getElementById('toastContainer');
+
+      // Load tasks from LocalStorage
+      const loadTasks = () => {
+        try {
+          const stored = localStorage.getItem('maincrafts_tasks');
+          tasks = stored ? JSON.parse(stored) : [];
+        } catch (e) {
+          console.error("Failed to load tasks from LocalStorage:", e);
+          tasks = [];
+        }
+      };
+
+      // Save tasks to LocalStorage
+      const saveTasks = () => {
+        try {
+          localStorage.setItem('maincrafts_tasks', JSON.stringify(tasks));
+        } catch (e) {
+          console.error("Failed to save tasks to LocalStorage:", e);
+          showToast("Failed to save data. Storage quota exceeded.", "error");
+        }
+      };
+
+      // Toast Notifications Utility
+      const showToast = (message, type = 'success', action = null) => {
+        const toast = document.createElement('div');
+        toast.className = 'toast-alert rounded-2xl p-4 flex items-center justify-between border border-white/10 text-sm text-white select-none';
+        
+        let iconClass = 'fa-circle-check text-emerald-400';
+        if (type === 'error') iconClass = 'fa-triangle-exclamation text-red-400';
+        if (type === 'info') iconClass = 'fa-circle-info text-cyan-400';
+
+        const content = document.createElement('div');
+        content.className = 'flex items-center gap-3';
+        content.innerHTML = `<i class="fa-solid ${iconClass} text-base"></i><span>${message}</span>`;
+        toast.appendChild(content);
+
+        if (action) {
+          const actionBtn = document.createElement('button');
+          actionBtn.className = 'ml-4 text-xs font-bold text-cyan-400 hover:text-cyan-300 uppercase tracking-wider py-1 px-2.5 rounded bg-white/5 border border-white/5 hover:bg-white/10 transition-all';
+          actionBtn.innerText = action.text;
+          actionBtn.addEventListener('click', () => {
+            action.callback();
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 350);
+          });
+          toast.appendChild(actionBtn);
+        }
+
+        toastContainer.appendChild(toast);
+
+        // Auto remove toast
+        const duration = action ? 6000 : 4000;
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.classList.add('fade-out');
+            setTimeout(() => {
+              if (toast.parentNode) toast.remove();
+            }, 350);
+          }
+        }, duration);
+      };
+
+      // Format time in seconds to HH:MM:SS
+      const formatTime = (totalSeconds) => {
+        if (isNaN(totalSeconds) || totalSeconds < 0) totalSeconds = 0;
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+        return [
+          hrs.toString().padStart(2, '0'),
+          mins.toString().padStart(2, '0'),
+          secs.toString().padStart(2, '0')
+        ].join(':');
+      };
+
+      // Format countdown time string until due date
+      const formatCountdownString = (ms) => {
+        if (isNaN(ms) || ms <= 0) return 'Overdue';
+        const days = Math.floor(ms / 86400000);
+        const hrs = Math.floor((ms % 86400000) / 3600000);
+        const mins = Math.floor((ms % 3600000) / 60000);
+        const secs = Math.floor((ms % 60000) / 1000);
+
+        let parts = [];
+        if (days > 0) parts.push(`${days}d`);
+        parts.push(`${hrs.toString().padStart(2, '0')}h`);
+        parts.push(`${mins.toString().padStart(2, '0')}m`);
+        parts.push(`${secs.toString().padStart(2, '0')}s`);
+        return parts.join(' ');
+      };
+
+      // Timer background loops
+      let globalTimerInterval = null;
+
+      const startGlobalTimerLoop = () => {
+        if (globalTimerInterval) return;
+        globalTimerInterval = setInterval(() => {
+          let activeTimers = 0;
+          tasks.forEach(task => {
+            if (task.isTimerRunning && task.timerStartedAt) {
+              activeTimers++;
+              const elapsed = Math.floor((Date.now() - new Date(task.timerStartedAt).getTime()) / 1000);
+              const totalSeconds = (task.timeSpent || 0) + elapsed;
+              const displayEl = document.getElementById(`timer-display-${task.id}`);
+              if (displayEl) {
+                displayEl.innerText = formatTime(totalSeconds);
+              }
+            }
+          });
+          if (activeTimers === 0) {
+            clearInterval(globalTimerInterval);
+            globalTimerInterval = null;
+          }
+        }, 1000);
+      };
+
+      // Countdown background loops
+      let globalCountdownInterval = null;
+
+      const startGlobalCountdownLoop = () => {
+        if (globalCountdownInterval) return;
+        globalCountdownInterval = setInterval(() => {
+          let activeCountdowns = 0;
+          tasks.forEach(task => {
+            if (task.dueDate && !task.isCompleted) {
+              activeCountdowns++;
+              const displayEl = document.getElementById(`due-countdown-${task.id}`);
+              if (displayEl) {
+                const targetTime = new Date(task.dueDate + 'T23:59:59').getTime();
+                const timeLeft = targetTime - Date.now();
+                if (timeLeft <= 0) {
+                  displayEl.className = "text-red-400 font-bold ml-1 animate-pulse";
+                  displayEl.innerText = " (Overdue)";
+                  const parentSpan = displayEl.closest('span');
+                  if (parentSpan) {
+                    parentSpan.className = "px-2.5 py-1 text-[10px] font-semibold flex items-center gap-1.5 border rounded-full bg-red-500/10 text-red-400 border-red-500/20 animate-pulse";
+                    const icon = parentSpan.querySelector('i');
+                    if (icon) {
+                      icon.className = "fa-solid fa-triangle-exclamation text-[11px]";
+                    }
+                  }
+                } else {
+                  displayEl.innerText = ` (${formatCountdownString(timeLeft)})`;
+                }
+              }
+            }
+          });
+          if (activeCountdowns === 0) {
+            clearInterval(globalCountdownInterval);
+            globalCountdownInterval = null;
+          }
+        }, 1000);
+      };
+
+      // Toggle Active Timer State
+      window.toggleTaskTimer = function(id) {
+        const index = tasks.findIndex(t => t.id === id);
+        if (index !== -1) {
+          const task = tasks[index];
+          if (task.isCompleted) {
+            showToast("Cannot start timer on completed tasks.", "error");
+            return;
+          }
+          if (task.isTimerRunning) {
+            // Pause
+            const elapsed = Math.floor((Date.now() - new Date(task.timerStartedAt).getTime()) / 1000);
+            task.timeSpent = (task.timeSpent || 0) + elapsed;
+            task.isTimerRunning = false;
+            task.timerStartedAt = null;
+            showToast(`Timer paused at ${formatTime(task.timeSpent)}`);
+          } else {
+            // Start (pause other active timers)
+            tasks.forEach((t) => {
+              if (t.isTimerRunning && t.id !== id) {
+                const elap = Math.floor((Date.now() - new Date(t.timerStartedAt).getTime()) / 1000);
+                t.timeSpent = (t.timeSpent || 0) + elap;
+                t.isTimerRunning = false;
+                t.timerStartedAt = null;
+              }
+            });
+            task.isTimerRunning = true;
+            task.timerStartedAt = new Date().toISOString();
+            showToast("Timer tracking started!");
+            startGlobalTimerLoop();
+          }
+          saveTasks();
+          renderTasks();
+        }
+      };
+
+      // Reset Active Timer
+      window.resetTaskTimer = function(id) {
+        const index = tasks.findIndex(t => t.id === id);
+        if (index !== -1) {
+          tasks[index].isTimerRunning = false;
+          tasks[index].timerStartedAt = null;
+          tasks[index].timeSpent = 0;
+          saveTasks();
+          renderTasks();
+          showToast("Timer reset to 00:00:00");
+        }
+      };
+
+      // Description Characters Counter
+      if (taskDescInput) {
+        taskDescInput.addEventListener('input', () => {
+          const len = taskDescInput.value.length;
+          descCounter.innerText = `${len} / 200`;
+          if (len >= 180) {
+            descCounter.classList.add('text-red-400');
+            descCounter.classList.remove('text-slate-500');
+          } else {
+            descCounter.classList.remove('text-red-400');
+            descCounter.classList.add('text-slate-500');
+          }
+        });
+      }
+
+      // Render Stats Widgets
+      const renderStats = () => {
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.isCompleted).length;
+        const pending = total - completed;
+        const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        statTotal.innerText = total;
+        statCompleted.innerText = completed;
+        statPending.innerText = pending;
+        progressPercentage.innerText = `${rate}%`;
+        progressBar.style.width = `${rate}%`;
+      };
+
+      // Render Tasks List with filters & search
+      const renderTasks = () => {
+        renderStats();
+
+        // 1. Filter
+        const query = taskSearchInput.value.trim().toLowerCase();
+        const selectedPriority = filterPrioritySelect.value;
+
+        let filtered = tasks.filter(task => {
+          // Status filter
+          if (activeStatusFilter === 'pending' && task.isCompleted) return false;
+          if (activeStatusFilter === 'completed' && !task.isCompleted) return false;
+
+          // Priority filter
+          if (selectedPriority !== 'all' && task.priority !== selectedPriority) return false;
+
+          // Search term filter
+          if (query && !task.title.toLowerCase().includes(query)) return false;
+
+          return true;
+        });
+
+        // 2. Sort
+        const sortType = sortTasksSelect.value;
+        filtered.sort((a, b) => {
+          if (sortType === 'created_desc') {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          }
+          if (sortType === 'due_asc') {
+            // Sort due date ascending. Put tasks without due date at the end
+            if (!a.dueDate && !b.dueDate) return new Date(b.createdAt) - new Date(a.createdAt);
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+            return new Date(a.dueDate) - new Date(b.dueDate);
+          }
+          if (sortType === 'priority_desc') {
+            const priorityWeight = { high: 3, medium: 2, low: 1 };
+            if (priorityWeight[b.priority] !== priorityWeight[a.priority]) {
+              return priorityWeight[b.priority] - priorityWeight[a.priority];
+            }
+            return new Date(b.createdAt) - new Date(a.createdAt); // Secondary sort by date
+          }
+          return 0;
+        });
+
+        // 3. UI Render
+        tasksContainer.innerHTML = '';
+
+        if (filtered.length === 0) {
+          tasksContainer.classList.add('hidden');
+          emptyState.classList.remove('hidden');
+
+          if (tasks.length === 0) {
+            emptyStateTitle.innerText = "No tasks found";
+            emptyStateText.innerText = "Your workspace is empty. Create your first task on the left to get started.";
+          } else {
+            emptyStateTitle.innerText = "No matching results";
+            emptyStateText.innerText = "Try adjusting your search queries or priority/status filters.";
+          }
+        } else {
+          emptyState.classList.add('hidden');
+          tasksContainer.classList.remove('hidden');
+
+          filtered.forEach((task, index) => {
+            const card = document.createElement('div');
+            card.id = `task-card-${task.id}`;
+            
+            const isCompleted = task.isCompleted;
+            
+            // Priority styling
+            let priorityBadge = '';
+            if (task.priority === 'high') {
+              priorityBadge = `<span class="px-2.5 py-1 text-[10px] font-bold bg-red-500/10 text-red-400 border-2 border-black rounded-full flex items-center gap-1.5 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>High</span>`;
+            } else if (task.priority === 'medium') {
+              priorityBadge = `<span class="px-2.5 py-1 text-[10px] font-bold bg-yellow-500/10 text-yellow-400 border-2 border-black rounded-full flex items-center gap-1.5 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>Medium</span>`;
+            } else {
+              priorityBadge = `<span class="px-2.5 py-1 text-[10px] font-bold bg-green-500/10 text-green-400 border-2 border-black rounded-full flex items-center gap-1.5 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Low</span>`;
+            }
+
+            // Category badge color coding
+            let categoryBg = 'bg-indigo-500/10 text-indigo-400 border-black border-2 shadow-sm';
+            if (task.category === 'Personal') categoryBg = 'bg-pink-500/10 text-pink-400 border-black border-2 shadow-sm';
+            if (task.category === 'Shopping') categoryBg = 'bg-yellow-500/10 text-yellow-400 border-black border-2 shadow-sm';
+            if (task.category === 'Coding') categoryBg = 'bg-cyan-500/10 text-cyan-400 border-black border-2 shadow-sm';
+            if (task.category === 'Design') categoryBg = 'bg-purple-500/10 text-purple-400 border-black border-2 shadow-sm';
+
+            const categoryBadge = `<span class="px-2.5 py-1 text-[10px] font-bold ${categoryBg} rounded-full">${task.category}</span>`;
+
+            // Date Formatting & Overdue state
+            let dateBadge = '';
+            if (task.dueDate) {
+              try {
+                const dueDateObj = new Date(task.dueDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const isOverdue = dueDateObj < today && !isCompleted;
+                const formattedDate = dueDateObj.toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                });
+
+                const dateColorClass = isOverdue 
+                  ? 'bg-red-500/10 text-red-400 border-black border-2 animate-pulse shadow-sm'
+                  : 'bg-white/5 text-slate-400 border-black border-2 shadow-sm';
+
+                let countdownSpan = '';
+                if (!isCompleted) {
+                  const targetTime = new Date(task.dueDate + 'T23:59:59').getTime();
+                  const timeLeft = targetTime - Date.now();
+                  if (timeLeft <= 0) {
+                    countdownSpan = `<span class="text-red-400 font-bold ml-1 animate-pulse" id="due-countdown-${task.id}"> (Overdue)</span>`;
+                  } else {
+                    countdownSpan = `<span class="text-cyan-400 font-bold ml-1 font-mono" id="due-countdown-${task.id}"> (${formatCountdownString(timeLeft)})</span>`;
+                  }
+                }
+                
+                dateBadge = `
+                  <span class="px-2.5 py-1 text-[10px] font-semibold flex items-center gap-1.5 border-2 rounded-full ${dateColorClass}">
+                    <i class="fa-solid ${isOverdue ? 'fa-triangle-exclamation' : 'fa-calendar-days'} text-[11px]"></i> Due: ${formattedDate}${countdownSpan}
+                  </span>
+                `;
+              } catch(e) {
+                console.error(e);
+              }
+            }
+
+            // Calculate current display seconds
+            let currentSeconds = task.timeSpent || 0;
+            if (task.isTimerRunning && task.timerStartedAt) {
+              const elapsed = Math.floor((Date.now() - new Date(task.timerStartedAt).getTime()) / 1000);
+              currentSeconds += elapsed;
+            }
+
+            // Fancy Stopwatch Component
+            const timerHtml = `
+              <div class="flex items-center justify-between mt-3.5 mb-2.5 p-2.5 bg-white/[0.03] border-2 border-black rounded-xl z-20 relative hover:border-cyan-500/40 transition-colors shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-stopwatch text-cyan-400 ${task.isTimerRunning ? 'animate-pulse' : ''} text-xs"></i>
+                  <span class="text-xs font-mono font-bold text-white tracking-wider" id="timer-display-${task.id}">
+                    ${formatTime(currentSeconds)}
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="toggleTaskTimer('${task.id}')" ${isCompleted ? 'disabled' : ''} class="px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 ${isCompleted ? 'opacity-40 cursor-not-allowed bg-white/5 text-slate-500 border-2 border-black shadow-sm' : task.isTimerRunning ? 'bg-yellow-500/15 text-yellow-400 border-2 border-black hover:bg-yellow-500/25 shadow-md' : 'bg-cyan-500/15 text-cyan-400 border-2 border-black hover:bg-cyan-500/25 shadow-md'} hover:scale-105 transition-all">
+                    <i class="fa-solid ${task.isTimerRunning ? 'fa-pause' : 'fa-play'} text-[8px]"></i> ${task.isTimerRunning ? 'Pause' : 'Start'}
+                  </button>
+                  <button onclick="resetTaskTimer('${task.id}')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border-2 border-black flex items-center gap-1 hover:scale-105 transition-all shadow-sm">
+                    <i class="fa-solid fa-rotate-left text-[8px]"></i> Reset
+                  </button>
+                </div>
+              </div>
+            `;
+
+            card.className = `premium-card p-5 md:p-6 rounded-3xl flex items-start gap-4 transition-all duration-300 relative group overflow-hidden ${isCompleted ? 'opacity-60' : ''}`;
+            
+            card.innerHTML = `
+              <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-cyan-500/5 pointer-events-none"></div>
+              
+              <!-- Completion Checkbox -->
+              <div class="pt-0.5 z-10">
+                <label class="custom-checkbox">
+                  <input type="checkbox" ${isCompleted ? 'checked' : ''} onchange="toggleTaskComplete('${task.id}')">
+                  <span class="checkmark"></span>
+                </label>
+              </div>
+
+              <!-- Content Area -->
+              <div class="flex-grow z-10 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  ${priorityBadge}
+                  ${categoryBadge}
+                  ${dateBadge}
+                </div>
+                <h4 class="font-syne font-bold text-white text-base md:text-lg leading-snug break-words ${isCompleted ? 'line-through text-slate-500' : ''}">
+                  ${task.title}
+                </h4>
+                ${task.description ? `<p class="text-slate-400 text-sm leading-relaxed mt-1.5 break-words">${task.description}</p>` : ''}
+                
+                <!-- Time Tracker Section -->
+                ${timerHtml}
+
+                <div class="flex justify-between items-center mt-4 pt-3 border-t border-white/5 text-[10px] font-semibold text-slate-500">
+                  <span>Created: ${new Date(task.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                  
+                  <!-- Action Controls -->
+                  <div class="flex items-center gap-2">
+                    <button onclick="openNotesModal('${task.id}')" class="w-8 h-8 rounded-lg relative ${task.notes ? 'bg-emerald-500/10 text-emerald-400 border-2 border-black hover:bg-emerald-500 shadow-md' : 'bg-indigo-500/10 text-indigo-400 border-2 border-black hover:bg-indigo-500 shadow-sm'} hover:text-white flex items-center justify-center transition-all duration-300 hover:scale-105" title="Task notes">
+                      <i class="fa-solid fa-note-sticky text-xs"></i>
+                      ${task.notes ? '<span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 border border-navy rounded-full animate-ping"></span><span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 border border-navy rounded-full"></span>' : ''}
+                    </button>
+                    <button onclick="editTask('${task.id}')" class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white border-2 border-black flex items-center justify-center transition-all duration-300 hover:scale-105" title="Edit task shadow-sm">
+                      <i class="fa-solid fa-pencil text-xs"></i>
+                    </button>
+                    <button onclick="triggerDeleteTask('${task.id}')" class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border-2 border-black flex items-center justify-center transition-all duration-300 hover:scale-105" title="Delete task shadow-sm">
+                      <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            tasksContainer.appendChild(card);
+          });
+          
+          // Start global countdown loops if any active tasks have due dates
+          const hasDueDates = filtered.some(t => t.dueDate && !t.isCompleted);
+          if (hasDueDates) {
+            startGlobalCountdownLoop();
+          }
+        }
+      };
+
+      // Add & Update Action Submit
+      taskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        let isValid = true;
+        titleError.classList.add('hidden');
+        taskTitleInput.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+
+        const titleVal = taskTitleInput.value.trim();
+        const descVal = taskDescInput.value.trim();
+        const categoryVal = taskCategorySelect.value;
+        const dueDateVal = taskDueDateInput.value;
+        
+        // Form radio group priority
+        const priorityVal = document.querySelector('input[name="priority"]:checked').value;
+
+        // Validation
+        if (!titleVal || titleVal.length < 3) {
+          taskTitleInput.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+          titleError.classList.remove('hidden');
+          isValid = false;
+        }
+
+        if (isValid) {
+          if (editingTaskId !== null) {
+            // Update mode
+            const index = tasks.findIndex(t => t.id === editingTaskId);
+            if (index !== -1) {
+              tasks[index] = {
+                ...tasks[index],
+                title: titleVal,
+                description: descVal,
+                priority: priorityVal,
+                category: categoryVal,
+                dueDate: dueDateVal,
+                updatedAt: new Date().toISOString()
+              };
+              saveTasks();
+              showToast("Task updated successfully!");
+            }
+            exitEditMode();
+          } else {
+            // Create mode
+            const newTask = {
+              id: 'task_' + Math.random().toString(36).substring(2, 11),
+              title: titleVal,
+              description: descVal,
+              priority: priorityVal,
+              category: categoryVal,
+              dueDate: dueDateVal,
+              isCompleted: false,
+              createdAt: new Date().toISOString(),
+              timeSpent: 0,
+              isTimerRunning: false,
+              timerStartedAt: null,
+              notes: ''
+            };
+            tasks.push(newTask);
+            saveTasks();
+            showToast("New task created successfully!");
+          }
+
+          // Reset Form
+          taskForm.reset();
+          descCounter.innerText = "0 / 200";
+          descCounter.classList.remove('text-red-400');
+          descCounter.classList.add('text-slate-500');
+
+          renderTasks();
+        }
+      });
+
+      // Toggle Task Completion State
+      window.toggleTaskComplete = function(id) {
+        const index = tasks.findIndex(t => t.id === id);
+        if (index !== -1) {
+          const task = tasks[index];
+          task.isCompleted = !task.isCompleted;
+          if (task.isCompleted && task.isTimerRunning) {
+            // Auto pause running timers on complete
+            const elapsed = Math.floor((Date.now() - new Date(task.timerStartedAt).getTime()) / 1000);
+            task.timeSpent = (task.timeSpent || 0) + elapsed;
+            task.isTimerRunning = false;
+            task.timerStartedAt = null;
+          }
+          saveTasks();
+          showToast(task.isCompleted ? "Task marked as completed!" : "Task marked as pending.");
+          renderTasks();
+        }
+      };
+
+      // Edit Task details loader
+      window.editTask = function(id) {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+          editingTaskId = id;
+          formTitle.innerText = "Edit Task";
+          submitTaskBtn.innerText = "Update Task";
+          cancelEditBtn.classList.remove('hidden');
+
+          // Load inputs
+          taskTitleInput.value = task.title;
+          taskDescInput.value = task.description || '';
+          descCounter.innerText = `${task.description ? task.description.length : 0} / 200`;
+          
+          // Select radio
+          const priorityRadios = document.getElementsByName('priority');
+          priorityRadios.forEach(radio => {
+            if (radio.value === task.priority) radio.checked = true;
+          });
+
+          taskCategorySelect.value = task.category;
+          taskDueDateInput.value = task.dueDate || '';
+
+          // Scroll form into view on smaller displays
+          document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+
+      const exitEditMode = () => {
+        editingTaskId = null;
+        formTitle.innerText = "Create New Task";
+        submitTaskBtn.innerText = "Add Task";
+        cancelEditBtn.classList.add('hidden');
+        taskForm.reset();
+        descCounter.innerText = "0 / 200";
+      };
+
+      if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', exitEditMode);
+      }
+
+      // Confirmation Modal: Deletion details
+      window.triggerDeleteTask = function(id) {
+        deleteTargetIndex = tasks.findIndex(t => t.id === id);
+        if (deleteTargetIndex !== -1) {
+          openModal(confirmDeleteModal, modalDeleteCard);
+        }
+      };
+
+      const executeDeleteTask = () => {
+        if (deleteTargetIndex !== null && deleteTargetIndex !== -1) {
+          // Clear any active undo trigger
+          if (undoTimeout) {
+            clearTimeout(undoTimeout);
+            lastDeletedTask = null;
+          }
+
+          // Back up deleted task
+          lastDeletedTask = { 
+            task: tasks[deleteTargetIndex],
+            index: deleteTargetIndex 
+          };
+
+          // Remove task
+          tasks.splice(deleteTargetIndex, 1);
+          saveTasks();
+          renderTasks();
+          closeModal(confirmDeleteModal, modalDeleteCard);
+
+          showToast("Task deleted successfully.", "info", {
+            text: "Undo",
+            callback: () => {
+              if (lastDeletedTask) {
+                // Restore task
+                tasks.splice(lastDeletedTask.index, 0, lastDeletedTask.task);
+                saveTasks();
+                renderTasks();
+                showToast("Task deletion undone!");
+                lastDeletedTask = null;
+              }
+            }
+          });
+
+          // Cleanup undo backup after 5.5 seconds
+          undoTimeout = setTimeout(() => {
+            lastDeletedTask = null;
+          }, 5500);
+
+          deleteTargetIndex = null;
+        }
+      };
+
+      if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', executeDeleteTask);
+      if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', () => closeModal(confirmDeleteModal, modalDeleteCard));
+      if (modalDeleteOverlay) modalDeleteOverlay.addEventListener('click', () => closeModal(confirmDeleteModal, modalDeleteCard));
+
+      // Confirmation Modal: Clear all tasks details
+      if (clearAllTasksBtn) {
+        clearAllTasksBtn.addEventListener('click', () => {
+          if (tasks.length === 0) {
+            showToast("No tasks available to delete.", "info");
+            return;
+          }
+          openModal(confirmClearModal, modalClearCard);
+        });
+      }
+
+      const executeClearAllTasks = () => {
+        tasks = [];
+        saveTasks();
+        exitEditMode();
+        renderTasks();
+        closeModal(confirmClearModal, modalClearCard);
+        showToast("All tasks cleared successfully.");
+      };
+
+      if (confirmClearBtn) confirmClearBtn.addEventListener('click', executeClearAllTasks);
+      if (cancelClearBtn) cancelClearBtn.addEventListener('click', () => closeModal(confirmClearModal, modalClearCard));
+      if (modalClearOverlay) modalClearOverlay.addEventListener('click', () => closeModal(confirmClearModal, modalClearCard));
+
+      // Modal visual opening animation helper
+      const openModal = (modal, card) => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+          card.classList.remove('scale-95', 'opacity-0');
+          card.classList.add('scale-100', 'opacity-100');
+        }, 10);
+      };
+
+      // Modal visual closing animation helper
+      const closeModal = (modal, card) => {
+        card.classList.remove('scale-100', 'opacity-100');
+        card.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          modal.classList.remove('flex');
+          modal.classList.add('hidden');
+        }, 300);
+      };
+
+      // Filter Status tabs click list trigger
+      filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          filterTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          activeStatusFilter = tab.getAttribute('data-status');
+          renderTasks();
+        });
+      });
+
+      // Search typing input trigger
+      taskSearchInput.addEventListener('input', renderTasks);
+
+      // Filter select items change trigger
+      filterPrioritySelect.addEventListener('change', renderTasks);
+      sortTasksSelect.addEventListener('change', renderTasks);
+
+      // Notes state & elements
+      let notesTargetTaskId = null;
+      const notesModal = document.getElementById('notesModal');
+      const modalNotesOverlay = document.getElementById('modalNotesOverlay');
+      const modalNotesCard = document.getElementById('modalNotesCard');
+      const modalNotesTaskTitle = document.getElementById('modalNotesTaskTitle');
+      const taskNotesArea = document.getElementById('taskNotesArea');
+      const notesSavedIndicator = document.getElementById('notesSavedIndicator');
+      const notesCharCounter = document.getElementById('notesCharCounter');
+      const saveNotesBtn = document.getElementById('saveNotesBtn');
+      const deleteNotesBtn = document.getElementById('deleteNotesBtn');
+      const closeNotesBtn = document.getElementById('closeNotesBtn');
+
+      // Notes modal open trigger
+      window.openNotesModal = function(id) {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+          notesTargetTaskId = id;
+          modalNotesTaskTitle.innerText = task.title;
+          taskNotesArea.value = task.notes || '';
+          notesSavedIndicator.classList.add('hidden');
+          
+          const len = taskNotesArea.value.length;
+          notesCharCounter.innerText = `${len} / 1000`;
+          notesCharCounter.classList.remove('text-red-400');
+          notesCharCounter.classList.add('text-slate-500');
+
+          if (task.notes && task.notes.trim()) {
+            deleteNotesBtn.classList.remove('hidden');
+          } else {
+            deleteNotesBtn.classList.add('hidden');
+          }
+
+          openModal(notesModal, modalNotesCard);
+        }
+      };
+
+      // Save Notes
+      const executeSaveNotes = () => {
+        if (notesTargetTaskId !== null) {
+          const index = tasks.findIndex(t => t.id === notesTargetTaskId);
+          if (index !== -1) {
+            const text = taskNotesArea.value.trim();
+            tasks[index].notes = text;
+            saveTasks();
+            renderTasks();
+            
+            // Show saved success UI
+            notesSavedIndicator.classList.remove('hidden');
+            if (text) {
+              deleteNotesBtn.classList.remove('hidden');
+            } else {
+              deleteNotesBtn.classList.add('hidden');
+            }
+
+            // Button check state animation
+            const originalHTML = saveNotesBtn.innerHTML;
+            saveNotesBtn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Saved!`;
+            saveNotesBtn.classList.remove('from-indigo-500', 'to-cyan-500');
+            saveNotesBtn.classList.add('bg-emerald-600');
+            
+            setTimeout(() => {
+              saveNotesBtn.innerHTML = originalHTML;
+              saveNotesBtn.classList.add('from-indigo-500', 'to-cyan-500');
+              saveNotesBtn.classList.remove('bg-emerald-600');
+            }, 1500);
+
+            showToast("Task note saved successfully!");
+          }
+        }
+      };
+
+      // Delete Notes
+      const executeDeleteNotes = () => {
+        if (notesTargetTaskId !== null) {
+          const index = tasks.findIndex(t => t.id === notesTargetTaskId);
+          if (index !== -1) {
+            tasks[index].notes = '';
+            saveTasks();
+            renderTasks();
+            taskNotesArea.value = '';
+            notesCharCounter.innerText = "0 / 1000";
+            notesSavedIndicator.classList.add('hidden');
+            deleteNotesBtn.classList.add('hidden');
+            closeModal(notesModal, modalNotesCard);
+            showToast("Note deleted successfully.", "info");
+          }
+        }
+      };
+
+      if (saveNotesBtn) saveNotesBtn.addEventListener('click', executeSaveNotes);
+      if (deleteNotesBtn) deleteNotesBtn.addEventListener('click', executeDeleteNotes);
+      if (closeNotesBtn) closeNotesBtn.addEventListener('click', () => closeModal(notesModal, modalNotesCard));
+      if (modalNotesOverlay) modalNotesOverlay.addEventListener('click', () => closeModal(notesModal, modalNotesCard));
+
+      // Note character counter
+      if (taskNotesArea) {
+        taskNotesArea.addEventListener('input', () => {
+          const len = taskNotesArea.value.length;
+          notesCharCounter.innerText = `${len} / 1000`;
+          if (len >= 900) {
+            notesCharCounter.classList.add('text-red-400');
+            notesCharCounter.classList.remove('text-slate-500');
+          } else {
+            notesCharCounter.classList.remove('text-red-400');
+            notesCharCounter.classList.add('text-slate-500');
+          }
+        });
+      }
+
+      // Initialize
+      loadTasks();
+      renderTasks();
+      
+      // Auto-start timer loops if any task loads as active
+      const runningCount = tasks.filter(t => t.isTimerRunning).length;
+      if (runningCount > 0) {
+        startGlobalTimerLoop();
+      }
+    });
+  </script>
+</body>
+
+</html>
